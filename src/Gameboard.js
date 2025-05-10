@@ -8,7 +8,7 @@ export default class Gameboard{
     }
 
     init() {
-        this.addShipRecursively(2, 2, 2, 0, new Ship());
+        this.addShipRecursively(2, 2, 2, 0, new Ship(2));
     }
 
     printBoard() {
@@ -45,7 +45,6 @@ export default class Gameboard{
         this.set.add(`(${x}, ${y})`);
         if (this.isShip(x, y)) {
             this.board[y][x].hit();
-            // if (this.board[y][x].isSunk())
             return 1;
         } else {
             this.board[y][x] = 'X';
