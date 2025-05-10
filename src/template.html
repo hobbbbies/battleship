@@ -1,20 +1,47 @@
+src/template.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Battleship Game</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-    <container class="main-container">
+    <div class="game-container">
         <header>
-            <h1>Vitanov's <em>BATTLESHIP</em></h1>
+            <h1>Battleship</h1>
+            <div class="game-status">
+                <p id="status-message">Place your ships!</p>
+                <p id="turn-indicator">Player's turn</p>
+            </div>
         </header>
-        <main>
-            <div class="board"></div>
+
+        <main class="boards-container">
+            <section class="player-section">
+                <h2>Your Board</h2>
+                <div class="game-board" id="player-board"></div>
+                <div class="ship-yard" id="player-ships">
+                    <h3>Your Ships</h3>
+                    <div class="ship-container"></div>
+                </div>
+            </section>
+
+            <section class="opponent-section">
+                <h2>Opponent's Board</h2>
+                <div class="game-board" id="opponent-board"></div>
+            </section>
         </main>
-        <footer></footer>
-    </container>
+
+        <aside class="controls">
+            <button id="start-game">Start Game</button>
+            <button id="rotate-ship">Rotate Ship</button>
+            <button id="reset-game">Reset Game</button>
+        </aside>
+
+        <footer>
+            <p>Created by Vitanov</p>
+        </footer>
+    </div>
 </body>
 </html>

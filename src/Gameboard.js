@@ -7,6 +7,10 @@ export default class Gameboard{
         this.set = new Set();
     }
 
+    init() {
+        this.addShipRecursively(2, 2, 2, 0, new Ship());
+    }
+
     printBoard() {
         return this.board.map(row => 
             row.map(cell => {
@@ -37,12 +41,19 @@ export default class Gameboard{
     }
 
     receiveAttack(x, y) {
-        if (this.set.has(`(${x}, ${y})`)) return;
+        if (this.set.has(`(${x}, ${y})`)) return -1;
         this.set.add(`(${x}, ${y})`);
-        if (this.board[y][x] instanceof Ship) {
+        if (this.isShip(x, y)) {
             this.board[y][x].hit();
+            // if (this.board[y][x].isSunk())
+            return 1;
         } else {
             this.board[y][x] = 'X';
+            return 0;
         }
+    }
+
+    isShip(x, y) {
+        return (this.board[y][x] instanceof Ship)
     }
 }
