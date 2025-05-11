@@ -20,6 +20,11 @@ describe("GameManager", () => {
         gameManager = new GameManager(10);
     });
 
+    describe("cpuTurn", () => {
+        test("should not play a cell that is out of bounds")
+        test("should recursively retry playTurn until it chooses a cell that isn't already marked");
+    });
+
     describe("playTurn", () => {
         test("should switch turns after successful attack", () => {
             const initialPlayer = gameManager.turn;

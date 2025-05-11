@@ -3,6 +3,7 @@ import render from './render';
 
 export default class GameManager {
     constructor(boardSize) {
+        this.boardSize = boardSize;
         this.player = new Player("player", boardSize);
         this.computer = new Player("opponent", boardSize);
         this.turn = this.player;
@@ -26,6 +27,10 @@ export default class GameManager {
         }
     }
 
-    disableBoard(board) {
+    cpuTurn() {
+        if (this.turn !== this.computer) return;
+        const x = Math.floor(Math.random() * this.boardSize);
+        const y = Math.floor(Math.random() * this.boardSize);
+        if (this.playTurn(x, y) === -1) this.cpuTurn();
     }
 }
