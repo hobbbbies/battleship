@@ -3,9 +3,9 @@ import render from './render';
 
 export default class GameManager {
     constructor(boardSize) {
-        this.player = new Player(boardSize);
-        this.computer = new Player(boardSize);
-        this.currentPlayer = this.player;
+        this.player = new Player("player", boardSize);
+        this.computer = new Player("opponent", boardSize);
+        this.turn = this.player;
     }
 
     init() {
@@ -15,6 +15,13 @@ export default class GameManager {
 
     render() {
         // Call your render function with the current game state
-        render(this.player.gameboard, this.computer.gameboard);
+        render(this, this.player, this.computer);
+    }
+
+    playTurn(x, y) {
+        if(this.turn.gameboard.receiveAttack(x, y) === -1) {
+            return -1;
+        }
+        this.turn = this.turn === this.player ? this.computer : this.player;
     }
 }

@@ -1,5 +1,6 @@
 import Ship from "./Ship";
 import Gameboard from "./Gameboard";
+import GameManager from "./GameManager";
 
 describe("ship class", () => {
     test("toString returns correct string based on ship state", () => {
@@ -9,6 +10,36 @@ describe("ship class", () => {
         ship.hit();
         ship.hit();
         expect(ship.toString()).toBe('SUNK');
+    });
+});
+
+describe("GameManager", () => {
+    let gameManager;
+
+    beforeEach(() => {
+        gameManager = new GameManager(10);
+    });
+
+    describe("playTurn", () => {
+        test("should switch turns after successful attack", () => {
+            const initialPlayer = gameManager.turn;
+            gameManager.playTurn(0, 0);
+            expect(gameManager.turn).not.toBe(initialPlayer);
+        });
+    });
+
+    test("should not switch turns after invalid attack", () => {
+      // Store initial player
+      const initialPlayer = gameManager.turn;
+
+      // Try to attack same spot twice
+      gameManager.playTurn(0, 0);
+      gameManager.playTurn(0, 0);
+      gameManager.playTurn(0, 0);
+
+
+      // Verify turn is still with second player
+      expect(gameManager.turn).toBe(initialPlayer);
     });
 });
 

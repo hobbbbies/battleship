@@ -114,6 +114,10 @@ button:hover {
     background-color: var(--ship-color) !important;
 }
 
+.enemy-ship {
+    background-color: var(--light-gray);
+}
+
 .hit {
     background-color: var(--hit-color) !important;
 }
