@@ -5,4 +5,4 @@ import Player from "./Player"
 import GameManager from "./gameManager"
 
 const game = new GameManager(10);
-game.render();
+game.init(3);

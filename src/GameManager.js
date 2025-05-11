@@ -1,5 +1,6 @@
 import Player from './Player';
 import render from './render';
+import findRandom from './findRandom';
 
 export default class GameManager {
     constructor(boardSize) {
@@ -9,8 +10,10 @@ export default class GameManager {
         this.turn = this.player;
     }
 
-    init() {
+    init(num) {
         // Initialize game state
+        this.player.gameboard.init(num);
+        this.computer.gameboard.init(num);
         this.render();
     }
 
@@ -29,8 +32,7 @@ export default class GameManager {
 
     cpuTurn() {
         if (this.turn !== this.computer) return;
-        const x = Math.floor(Math.random() * this.boardSize);
-        const y = Math.floor(Math.random() * this.boardSize);
+        const { x , y } = findRandom(this.boardSize);
         if (this.playTurn(x, y) === -1) this.cpuTurn();
     }
 }

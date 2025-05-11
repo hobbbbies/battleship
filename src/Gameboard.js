@@ -1,4 +1,5 @@
 import Ship from "./Ship";
+import findRandom from "./findRandom";
 
 export default class Gameboard{
     constructor(size = 10){
@@ -7,8 +8,13 @@ export default class Gameboard{
         this.set = new Set();
     }
 
-    init() {
-        this.addShipRecursively(2, 2, 2, 0, new Ship(2));
+    init(num) {
+        const shipSizes = [5, 4, 3, 2, 1];
+        for (let i = 0; i < num; i++) {
+            const { x, y } = findRandom(this.size - shipSizes[i], this.size);
+            const orientation = findRandom(2);
+            if(this.addShipRecursively(x, y, shipSizes[i], orientation.x, new Ship(shipSizes[i])) === -1) i--;
+        }
     }
 
     printBoard() {
@@ -23,7 +29,7 @@ export default class Gameboard{
     
     addShipRecursively(x, y, length, orientation, ship) { 
         if (length <= 0) return;
-        if (this.checkCoordinateBounds(x, y)) return -1;
+        if (this.checkCoordinateBounds(x, y) || this.isShip(x ,y)) return -1;
         
         this.board[y][x] = ship;
         
@@ -41,7 +47,7 @@ export default class Gameboard{
     }
 
     receiveAttack(x, y) {
-        if (this.set.has(`(${x}, ${y})`)) return -1;
+        if (this.set.has(`(${x}, ${y})`) || this.checkCoordinateBounds(x, y)) return -1;
         this.set.add(`(${x}, ${y})`);
         if (this.isShip(x, y)) {
             this.board[y][x].hit();

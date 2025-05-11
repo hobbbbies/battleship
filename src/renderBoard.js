@@ -14,7 +14,9 @@ function addCellListener(gameManager, cell, playerBoard, playerDiv) {
     const [x, y] = JSON.parse(cell.dataset.cords);
     console.log(gameManager.turn);
     gameManager.playTurn(x, y);
-    renderBoard(gameManager, playerBoard, playerDiv);
+    gameManager.cpuTurn();
+    gameManager.render();
+    // renderBoard(gameManager, playerBoard, playerDiv);
   }
 
   cell.addEventListener("click", handleCellClick);
@@ -52,3 +54,4 @@ function getCellState(playerBoard, x, y) {
   
   return playerBoard.team === "player" ? { text: "", className: "ship" } : { text: "", className: "enemy-ship"};
 }
+

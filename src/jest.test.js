@@ -21,8 +21,44 @@ describe("GameManager", () => {
     });
 
     describe("cpuTurn", () => {
-        test("should not play a cell that is out of bounds")
-        test("should recursively retry playTurn until it chooses a cell that isn't already marked");
+        describe("cpuTurn", () => {
+          test("should not play a cell that is out of bounds", () => {
+            let callCount = 0;
+            const mockMath = Object.create(global.Math);
+            mockMath.random = () => {
+              callCount++;
+              if (callCount > 3) {
+                // Prevent infinite recursion in test
+                return 0.5; // Return valid coordinates after 3 attempts
+              }
+              return 1.1; // Return out of bounds coordinates
+            };
+            global.Math = mockMath;
+
+            gameManager.turn = gameManager.computer;
+            gameManager.cpuTurn();
+
+            // Verify that multiple attempts were made
+            expect(callCount).toBe(6);
+
+            // Restore original Math
+            global.Math = Object.create(global.Math);
+            });
+        });
+
+        test("should mark the correct cell on the playerBoard", () => {
+          jest.spyOn(global.Math, "random").mockReturnValue(0.5); // or any fixed value
+
+          gameManager.turn = gameManager.computer;
+          gameManager.cpuTurn();
+
+          const markedCells = gameManager.player.gameboard.board
+            .flat()
+            .filter((cell) => cell === "X").length;
+          expect(markedCells).toBe(1);
+
+          jest.spyOn(global.Math, "random").mockRestore(); // restore original
+        });
     });
 
     describe("playTurn", () => {
@@ -55,25 +91,63 @@ describe("gameboard", () => {
         myBoard = new Gameboard();
     });
 
+    describe("init", () => {
+      test("should create all ships on the board", () => {
+        myBoard.init(5);
+        const shipCells = myBoard.board
+          .flat()
+          .filter((cell) => cell instanceof Ship).length;
+        expect(shipCells).toBeGreaterThan(9);
+      });
+    });
+
     describe("addShip", () => {
-        test("should fill all required positions with ship", () => {
+        test("should fill all required positions for horizontal ship", () => {
             const x = 5;
             const y = 5;
             const length = 3;
-            const testShip = new Ship();
+            const testShip = new Ship(length);
 
-            // Test horizontal placement (orientation 0)
             myBoard.addShipRecursively(x, y, length, 0, testShip);
-            expect(myBoard.board[y][x]).toBe(testShip);
-            expect(myBoard.board[y][x + 1]).toBe(testShip);
-            expect(myBoard.board[y][x + 2]).toBe(testShip);
+            expect(myBoard.board[y][x]).toEqual({
+                length: length,
+                hits: 0,
+                sunk: false
+            });
+            expect(myBoard.board[y][x + 1]).toEqual({
+                length: length,
+                hits: 0,
+                sunk: false
+            });
+            expect(myBoard.board[y][x + 2]).toEqual({
+                length: length,
+                hits: 0,
+                sunk: false
+            });
+        });
 
-            // Test vertical placement (orientation 1)
-            const verticalShip = new Ship();
+        test("should fill all required positions for vertical ship", () => {
+            const x = 3; // Different coordinates to avoid overlap
+            const y = 3;
+            const length = 3;
+            const verticalShip = new Ship(length);
+            
             myBoard.addShipRecursively(x, y, length, 1, verticalShip);
-            expect(myBoard.board[y][x]).toBe(verticalShip);
-            expect(myBoard.board[y + 1][x]).toBe(verticalShip);
-            expect(myBoard.board[y + 2][x]).toBe(verticalShip);
+            expect(myBoard.board[y][x]).toEqual({
+                length: length,
+                hits: 0,
+                sunk: false
+            });
+            expect(myBoard.board[y + 1][x]).toEqual({
+                length: length,
+                hits: 0,
+                sunk: false
+            });
+            expect(myBoard.board[y + 2][x]).toEqual({
+                length: length,
+                hits: 0,
+                sunk: false
+            });
         });
 
         test("should return -1 if out of bounds", () => {
