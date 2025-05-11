@@ -3,8 +3,7 @@ export default function renderBoard(gameManager, playerBoard, playerDiv) {
   for (let i = 0; i < playerBoard.gameboard.board.length; i++) {
     for (let j = 0; j < playerBoard.gameboard.board[i].length; j++) {
       const cell = createCell(j, i, playerBoard);
-      // if (playerBoard.team === "playeer")
-      addCellListener(gameManager, cell, playerBoard, playerDiv);
+      if (playerBoard.team === "opponent") addCellListener(gameManager, cell, playerBoard, playerDiv);
       playerDiv.append(cell);
     }
   }
@@ -13,6 +12,7 @@ export default function renderBoard(gameManager, playerBoard, playerDiv) {
 function addCellListener(gameManager, cell, playerBoard, playerDiv) {
   function handleCellClick() {
     const [x, y] = JSON.parse(cell.dataset.cords);
+    console.log(gameManager.turn);
     gameManager.playTurn(x, y);
     renderBoard(gameManager, playerBoard, playerDiv);
   }

@@ -19,10 +19,11 @@ export default class GameManager {
     }
 
     playTurn(x, y) {
+        this.turn = this.turn === this.player ? this.computer : this.player;
         if(this.turn.gameboard.receiveAttack(x, y) === -1) {
+            this.turn = this.turn === this.player ? this.computer : this.player; // Switch turn back
             return -1;
         }
-        this.turn = this.turn === this.player ? this.computer : this.player;
     }
 
     disableBoard(board) {
