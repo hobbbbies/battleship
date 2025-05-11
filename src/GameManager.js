@@ -24,4 +24,7 @@ export default class GameManager {
         }
         this.turn = this.turn === this.player ? this.computer : this.player;
     }
+
+    disableBoard(board) {
+    }
 }
