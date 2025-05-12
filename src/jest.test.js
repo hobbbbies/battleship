@@ -91,7 +91,38 @@ describe("gameboard", () => {
         myBoard = new Gameboard();
     });
 
+    describe("neighbouringShip", () => {
+      test("should return false if there is a ship in neighboring cells", () => {
+        const ship = new Ship(2);
+        const x = 5;
+        const y = 5;
+
+        // Place a ship at (5,5)
+        myBoard.addShipRecursively(x, y, 2, 0, ship);
+
+        // Check neighboring coordinates
+        expect(myBoard.neighbouringShip(x + 1, y)).toBe(true); // Ship within 3 cells horizontally
+        expect(myBoard.neighbouringShip(x, y + 1)).toBe(true); // Ship within 3 cells vertically
+        expect(myBoard.neighbouringShip(x + 1, y + 1)).toBe(true); // Ship within 3 cells diagonally
+
+        // Check coordinate far from ship
+        expect(myBoard.neighbouringShip(x + 4, y + 4)).toBe(false); // No ship within 3 cells
+      });
+    });
+
     describe("init", () => {
+
+      test("should not create ships that are neighbouring", () => {
+        myBoard.init(2);
+        
+        // Check each cell on the board
+        for (let y = 0; y < myBoard.size; y++) {
+            for (let x = 0; x < myBoard.size; x++) {
+                expect(myBoard.neighbouringShip(x, y)).toBe(false);
+            }
+        }
+      });
+        
       test("should create all ships on the board", () => {
         myBoard.init(5);
         const shipCells = myBoard.board
