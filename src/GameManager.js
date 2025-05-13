@@ -13,6 +13,7 @@ export default class GameManager {
         this.gameStarted = false;
         this.playerShips = 0;
         this.computerShips = 0;
+        this.winner = null;
     }
 
     init() {
@@ -30,7 +31,7 @@ export default class GameManager {
 
     playTurn(x, y) {
         this.turn = this.turn === this.player ? this.computer : this.player;
-        if(this.turn.gameboard.receiveAttack(x, y) === -1) {
+        if(this.turn.gameboard.receiveAttack(x, y) === -1 || this.winner) {
             this.turn = this.turn === this.player ? this.computer : this.player; // Switch turn back
             return -1;
         }
@@ -58,7 +59,9 @@ export default class GameManager {
         this.updateShipCount();
         if (this.playerShips === 0 || this.computerShips === 0) {
             this.gameStarted = false;
-            return this.playerShips === 0 ? this.computer : this.player;
+            const winner = this.playerShips === 0 ? this.computer : this.player;
+            this.winner = winner.team;
+            return winner
         }
         return -1;
     }

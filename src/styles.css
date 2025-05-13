@@ -49,6 +49,11 @@ h1 {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
+#status-message {
+    font-size: 1.2em;
+    font-weight: bolder;
+}
+
 .boards-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
