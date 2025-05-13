@@ -2,6 +2,12 @@ import Ship from "./Ship";
 import Gameboard from "./Gameboard";
 import GameManager from "./GameManager";
 
+let tempArr;
+
+beforeEach(() => {
+    tempArr = Array.from({ length: 10 }, () => Array(10).fill(true));
+});
+
 describe("ship class", () => {
     test("toString returns correct string based on ship state", () => {
         const ship = new Ship(2);
@@ -18,6 +24,36 @@ describe("GameManager", () => {
 
     beforeEach(() => {
         gameManager = new GameManager(10);
+    });
+
+    describe("checkWin", () => {
+        test("should have 15 as the ship count", () => {
+        gameManager.player.gameboard.init();
+        gameManager.updateShipCount();
+        expect(gameManager.playerShips).toBe(15);
+        });
+        
+        test("should decrease ship count on successful hit", () => {
+            gameManager.computer.gameboard.addShipRecursively(1, 1, 2, 0, new Ship(), tempArr);
+            gameManager.playTurn(1, 1);
+            gameManager.playTurn(3,3);
+            gameManager.playTurn(2, 1);
+            gameManager.updateShipCount();
+            expect(gameManager.computerShips).toBe(0);
+        });
+
+        test("should change game state to finished when ships on either side are 0", () => {
+          gameManager.gameStarted = true;
+          gameManager.computer.gameboard.addShipRecursively(1, 1, 2, 0, new Ship(), tempArr);
+          gameManager.computer.gameboard.addShipRecursively(1, 1, 2, 0, new Ship(), tempArr);
+          gameManager.player.gameboard.addShipRecursively(5, 5, 1, 0, new Ship(), tempArr);
+          gameManager.playTurn(1, 1);
+          gameManager.playTurn(3,3);
+          gameManager.playTurn(2, 1);
+          gameManager.checkWin();
+          console.log("Player Ships", gameManager.playerShips, "Computer ships: ", gameManager.computerShips);
+          expect(gameManager.gameStarted).toBe(false);
+        });
     });
 
     describe("cpuTurn", () => {
@@ -86,11 +122,9 @@ describe("GameManager", () => {
 
 describe("gameboard", () => {
     let myBoard;
-    let tempArr;
 
     beforeEach(() => {
         myBoard = new Gameboard();
-        tempArr = Array.from({ length: 10 }, () => Array(10).fill(true));
     });
 
     describe("init", () => {

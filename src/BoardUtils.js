@@ -46,4 +46,16 @@ export default class BoardManagement {
     array.push(num);
     return this.calculateShipSizes(num - 1, array);
   }
+
+  static getShipCount(gameBoard) {
+    let count = 0;
+    for (let y = 0; y < gameBoard.size; y++) {
+        for (let x = 0; x < gameBoard.size; x++) {
+            if (gameBoard.board[y][x] instanceof Ship && !gameBoard.set.has(`(${x}, ${y})`)) {
+                count++;
+            }
+        }
+    }
+    return count;
+  }
 }

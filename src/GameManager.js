@@ -11,12 +11,15 @@ export default class GameManager {
         this.computer = new Player("opponent", boardSize);
         this.turn = this.player;
         this.gameStarted = false;
+        this.playerShips = 0;
+        this.computerShips = 0;
     }
 
     init() {
         // Initialize game state
         this.player.gameboard.init();
         this.computer.gameboard.init();
+        this.updateShipCount();
         this.render();
     }
 
@@ -31,6 +34,7 @@ export default class GameManager {
             this.turn = this.turn === this.player ? this.computer : this.player; // Switch turn back
             return -1;
         }
+        this.checkWin();
     }
 
     cpuTurn() {
@@ -43,5 +47,19 @@ export default class GameManager {
         this.player.gameboard = new Gameboard(newSize);
         this.computer.gameboard = new Gameboard(newSize); 
         this.init();
+    }
+
+    updateShipCount() {
+        this.playerShips = this.player.gameboard.getShipCount();
+        this.computerShips = this.computer.gameboard.getShipCount();
+    }
+
+    checkWin() {
+        this.updateShipCount();
+        if (this.playerShips === 0 || this.computerShips === 0) {
+            this.gameStarted = false;
+            return this.playerShips === 0 ? this.computer : this.player;
+        }
+        return -1;
     }
 }

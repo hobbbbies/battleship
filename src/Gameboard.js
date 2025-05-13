@@ -18,6 +18,10 @@ export default class Gameboard {
     return BoardUtils.checkCoordinateBounds(x, y, this.size);
   }
 
+  getShipCount() {
+    return BoardUtils.getShipCount(this);
+  }
+
   init() {
     
     // Resets all local properties 
@@ -58,7 +62,8 @@ export default class Gameboard {
         }
     }
     // Redo everything if there was some bug generating the ships 
-    if (this.board.flat().filter(cell => cell instanceof Ship).length < shipCount) this.init(num);
+    // Terrible idea, I know.
+    if (BoardUtils.getShipCount(this) < shipCount) this.init(num);
   }
 
   addShipRecursively(x, y, length, orientation, ship, tempArr) {
