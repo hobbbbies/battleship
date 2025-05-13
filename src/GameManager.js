@@ -2,6 +2,7 @@ import Player from './Player';
 import render from './render';
 import findRandom from './findRandom';
 import RenderUtils from './renderUtils';
+import Gameboard from './Gameboard';
 
 export default class GameManager {
     constructor(boardSize) {
@@ -36,5 +37,11 @@ export default class GameManager {
         if (this.turn !== this.computer) return;
         const { x , y } = findRandom(this.boardSize);
         if (this.playTurn(x, y) === -1) this.cpuTurn();
+    }
+
+    updateBoardSize(newSize) {
+        this.player.gameboard = new Gameboard(newSize);
+        this.computer.gameboard = new Gameboard(newSize); 
+        this.init();
     }
 }

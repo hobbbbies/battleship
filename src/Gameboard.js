@@ -6,7 +6,7 @@ export default class Gameboard {
   constructor(size = 10) {
     this.size = size;
     this.board = Array.from({ length: size }, () => Array(size).fill(null));
-    this.set = new Set();
+    this.set = new Set(); 
     this.freeSpots = Array.from({ length: size }, () => Array(size).fill(true));
   }
 

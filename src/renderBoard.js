@@ -1,5 +1,7 @@
 export default function renderBoard(gameManager, playerBoard, playerDiv) {
   playerDiv.textContent = "";
+  playerDiv.style.setProperty("--grid-size", playerBoard.gameboard.size);
+  
   for (let i = 0; i < playerBoard.gameboard.size; i++) {
     for (let j = 0; j < playerBoard.gameboard.size; j++) {
       const cell = createCell(j, i, playerBoard);

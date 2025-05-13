@@ -11,6 +11,7 @@ export default function render(gameManager, pOne, pTwo) {
     const newBoard = document.querySelector("#new-board")
     const resetBtn = document.querySelector("#reset-game");
     const startBtn = document.querySelector("#start-game");
+    const sizeSelector = document.querySelector("#board-size");
         
     if (!gameManager.gameStarted) {
         RenderUtils.initDisable(pOneDiv, pTwoDiv);
@@ -41,6 +42,17 @@ export default function render(gameManager, pOne, pTwo) {
       RenderUtils.enableBoard(pOneDiv);
       RenderUtils.enableBoard(pTwoDiv);
       gameManager.gameStarted = true;
+    });
+
+    sizeSelector.addEventListener('change', (e) => {
+        if (!gameManager.gameStarted) {
+            const newSize = parseInt(e.target.value);
+            gameManager.updateBoardSize(newSize);
+            gameManager.init();
+        } else {
+            alert("Cannot change board size while game is in progress!");
+            sizeSelector.value = gameManager.boardSize;
+        }
     });
 
     renderBoard(gameManager, pOne, pOneDiv);
