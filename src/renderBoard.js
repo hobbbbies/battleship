@@ -1,7 +1,7 @@
 export default function renderBoard(gameManager, playerBoard, playerDiv) {
   playerDiv.textContent = "";
-  for (let i = 0; i < playerBoard.gameboard.board.length; i++) {
-    for (let j = 0; j < playerBoard.gameboard.board[i].length; j++) {
+  for (let i = 0; i < playerBoard.gameboard.size; i++) {
+    for (let j = 0; j < playerBoard.gameboard.size; j++) {
       const cell = createCell(j, i, playerBoard);
       if (playerBoard.team === "opponent") addCellListener(gameManager, cell, playerBoard, playerDiv);
       playerDiv.append(cell);
@@ -9,14 +9,13 @@ export default function renderBoard(gameManager, playerBoard, playerDiv) {
   }
 }
 
-function addCellListener(gameManager, cell, playerBoard, playerDiv) {
+function addCellListener(gameManager, cell) {
   function handleCellClick() {
     const [x, y] = JSON.parse(cell.dataset.cords);
     console.log(gameManager.turn);
     gameManager.playTurn(x, y);
     gameManager.cpuTurn();
     gameManager.render();
-    // renderBoard(gameManager, playerBoard, playerDiv);
   }
 
   cell.addEventListener("click", handleCellClick);

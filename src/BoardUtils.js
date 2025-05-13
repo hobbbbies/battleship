@@ -10,18 +10,6 @@ export default class BoardManagement {
     return board[y][x] instanceof Ship;
   }
 
-  static checkPlacement(x, y, length, array, orientation) {
-    for (let i = 0; i < length; i++) {
-        const checkX = orientation === 0 ? x + i : x;
-        const checkY = orientation === 0 ? y : y + i;
-        
-        if (!array[checkY] || !array[checkY][checkX]) {
-            return false;
-        }
-    }
-    return true;
-  }
-
   static flagSurrounding(array, x, y, shipSpacing = 3) {
     for (let i = 0; i < shipSpacing; i++) {
         for (let j = 0; j < shipSpacing; j++) {
@@ -50,5 +38,12 @@ export default class BoardManagement {
       }
     }
     return { xBoundry, yBoundry };
+  }
+
+  static calculateShipSizes(num, array) {
+    if (num === 0) return;
+    
+    array.push(num);
+    return this.calculateShipSizes(num - 1, array);
   }
 }

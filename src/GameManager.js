@@ -1,6 +1,7 @@
 import Player from './Player';
 import render from './render';
 import findRandom from './findRandom';
+import RenderUtils from './renderUtils';
 
 export default class GameManager {
     constructor(boardSize) {
@@ -8,12 +9,13 @@ export default class GameManager {
         this.player = new Player("player", boardSize);
         this.computer = new Player("opponent", boardSize);
         this.turn = this.player;
+        this.gameStarted = false;
     }
 
-    init(num) {
+    init() {
         // Initialize game state
-        this.player.gameboard.init(num);
-        this.computer.gameboard.init(num);
+        this.player.gameboard.init();
+        this.computer.gameboard.init();
         this.render();
     }
 

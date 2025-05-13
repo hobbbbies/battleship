@@ -12,8 +12,8 @@ src/template.html
         <header>
             <h1>Battleship</h1>
             <div class="game-status">
-                <p id="status-message">Place your ships!</p>
-                <p id="turn-indicator">Player's turn</p>
+                <p id="status-message"></p>
+                <p id="turn-indicator"></p>
             </div>
         </header>
 
@@ -21,10 +21,6 @@ src/template.html
             <section class="player-section">
                 <h2>Your Board</h2>
                 <div class="game-board" id="player-board"></div>
-                <div class="ship-yard" id="player-ships">
-                    <h3>Your Ships</h3>
-                    <div class="ship-container"></div>
-                </div>
             </section>
 
             <section class="opponent-section">
@@ -35,7 +31,7 @@ src/template.html
 
         <aside class="controls">
             <button id="start-game">Start Game</button>
-            <button id="rotate-ship">Rotate Ship</button>
+            <button id="new-board">New Board</button>
             <button id="reset-game">Reset Game</button>
         </aside>
 

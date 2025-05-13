@@ -86,22 +86,11 @@ describe("GameManager", () => {
 
 describe("gameboard", () => {
     let myBoard;
+    let tempArr;
 
     beforeEach(() => {
         myBoard = new Gameboard();
-    });
-
-    describe("neighbouringShip", () => {
-      test("should return false if there is a ship in neighboring cells", () => {
-        const ship = new Ship(2);
-        const x = 5;
-        const y = 5;
-
-        // Place a ship at (5,5)
-        myBoard.addShipRecursively(x, y, 2, 0, ship);
-
-       // No ship within 3 cells
-      });
+        tempArr = Array.from({ length: 10 }, () => Array(10).fill(true));
     });
 
     describe("init", () => {
@@ -148,50 +137,59 @@ describe("gameboard", () => {
       });
 
         test("should fill all required positions for vertical ship", () => {
-            const x = 3; // Different coordinates to avoid overlap
-            const y = 3;
-            const length = 3;
-            const verticalShip = new Ship(length);
-            
-            myBoard.addShipRecursively(x, y, length, 1, verticalShip);
-            expect(myBoard.board[y][x]).toEqual({
-                length: length,
+            const verticalShip = new Ship(3);
+            myBoard.addShipRecursively(3, 3, 3, 1, verticalShip, tempArr);
+            expect(myBoard.board[3][3]).toEqual({
+                length: 3,
                 hits: 0,
                 sunk: false
             });
-            expect(myBoard.board[y + 1][x]).toEqual({
-                length: length,
+            expect(myBoard.board[4][3]).toEqual({
+                length: 3,
                 hits: 0,
                 sunk: false
             });
-            expect(myBoard.board[y + 2][x]).toEqual({
-                length: length,
+            expect(myBoard.board[5][3]).toEqual({
+                length: 3,
                 hits: 0,
                 sunk: false
             });
         });
 
         test("should return -1 if out of bounds", () => {
-            const result = myBoard.addShipRecursively(-1, 14, 2, 0, new Ship(2));
+            const result = myBoard.addShipRecursively(-1, 14, 2, 0, new Ship(2), tempArr);
+            expect(result).toBe(-1);
+        });
+
+        test("should maintain spacing between perpendicular ships", () => {
+            const ship1 = new Ship(3);
+            const ship2 = new Ship(3);
+            
+            // Place horizontal ship
+            myBoard.addShipRecursively(3, 3, 3, 0, ship1, tempArr);
+            
+            // Try to place vertical ship touching the first one
+            const result = myBoard.addShipRecursively(3, 2, 3, 1, ship2, tempArr);
+            
+            // Should fail to place second ship
             expect(result).toBe(-1);
         });
     });
 
     describe("receiveAttack", () => {
         test("should mark ship has hit", () => {
-            myBoard.addShipRecursively(3, 3, 2, 1, new Ship());
+            myBoard.addShipRecursively(3, 3, 2, 1, new Ship(), tempArr);
             myBoard.receiveAttack(3, 3);
             expect(myBoard.board[3][3].hits).toBe(1);
         });
 
         test("should register hits for all ship positions", () => {
-            const testShip = new Ship();
+            const testShip = new Ship(3);
             const x = 4;
             const y = 4;
-            const length = 3;
 
             // Place a horizontal ship
-            myBoard.addShipRecursively(x, y, length, 0, testShip);
+            myBoard.addShipRecursively(x, y, 3, 0, testShip, tempArr);
 
             // Attack each position
             myBoard.receiveAttack(x, y);
@@ -217,7 +215,7 @@ describe("gameboard", () => {
             const y = 6;
             
             // Place a horizontal ship of length 2
-            myBoard.addShipRecursively(x, y, 2, 0, ship);
+            myBoard.addShipRecursively(x, y, 2, 0, ship, tempArr);
             
             // Attack both positions to sink it
             myBoard.receiveAttack(x, y);
@@ -234,7 +232,7 @@ describe("gameboard", () => {
             const ship = new Ship(2);
 
             // Place ship and hit it once
-            myBoard.addShipRecursively(x, y, 2, 0, ship);
+            myBoard.addShipRecursively(x, y, 2, 0, ship, tempArr);
             myBoard.receiveAttack(x, y);
             expect(myBoard.board[y][x].hits).toBe(1);
 
@@ -261,7 +259,7 @@ describe("gameboard", () => {
         const board = new Gameboard(3); // Use smaller board for testing
         const ship = new Ship(2);
         
-        board.addShipRecursively(1, 1, 2, 0, ship);
+        board.addShipRecursively(1, 1, 2, 0, ship, tempArr);
         console.log(board.printBoard());
         board.receiveAttack(0, 0); // Miss
         
@@ -271,5 +269,47 @@ describe("gameboard", () => {
             ".   .   .";
             
         expect(board.printBoard()).toBe(expected);
+    });
+
+    describe("deleteShip" , () => {
+        test("should delete all recursively placed ships if addShipRecursively fails", () => {
+            const ship1 = new Ship(3);
+            const ship2 = new Ship(3);
+
+            // Place horizontal ship
+            myBoard.addShipRecursively(3, 3, 3, 0, ship1, tempArr);
+
+            // Try to place vertical ship touching the first one
+            const result = myBoard.addShipRecursively(3, 2, 3, 1, ship2, tempArr);
+
+            expect(myBoard.board[2][3]).toBe(null);
+        });
+
+        test("should do the same as the other test in reverse order", () => {
+            const ship1 = new Ship(3);
+            const ship2 = new Ship(3);
+
+            // Place horizontal ship
+            myBoard.addShipRecursively(3, 3, 3, 0, ship1, tempArr);
+
+            // Try to place vertical ship touching the first one
+            const result = myBoard.addShipRecursively(3, 2, 3, 0, ship2, tempArr);
+
+            expect(myBoard.board[4][3]).toBe(null);
+        });
+
+        test("should not allow 'L' shaped ships to occur", () => {
+            myBoard.addShipRecursively(4, 0, 5, 1, new Ship(5), tempArr);
+            const result = myBoard.addShipRecursively(2, 4, 4, 0, new Ship(4), tempArr);
+
+            expect(myBoard.board[4][2]).toBe(null);
+        });
+
+        test("should not allow ships to touch diagonally", () => {
+            myBoard.addShipRecursively(4, 0, 5, 1, new Ship(5), tempArr);
+            const result = myBoard.addShipRecursively(5, 5, 4, 1, new Ship(4), tempArr);
+
+            expect(myBoard.board[5][5]).toBe(null);
+        });
     });
 });
