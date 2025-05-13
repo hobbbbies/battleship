@@ -30,18 +30,32 @@ export default class GameManager {
     }
 
     playTurn(x, y) {
-        this.turn = this.turn === this.player ? this.computer : this.player;
-        if(this.turn.gameboard.receiveAttack(x, y) === -1 || this.winner) {
+        if(this.turn.gameboard.receiveAttack(x, y) === -1) {
             this.turn = this.turn === this.player ? this.computer : this.player; // Switch turn back
             return -1;
         }
         this.checkWin();
     }
 
-    cpuTurn() {
+    cpuTurn(lastHit = {}) {
         if (this.turn !== this.computer) return;
-        const { x , y } = findRandom(this.boardSize);
-        if (this.playTurn(x, y) === -1) this.cpuTurn();
+        if (Object.keys(lastHit).length > 0) this.smartHit(lastHit.x, lastHit.y);
+        else {
+            const { x, y } = findRandom(this.boardSize);
+            if (this.playTurn(x, y) === -1) this.cpuTurn();
+        }
+    }
+
+    smartHit(x, y) {
+        let xNext = Math.floor(Math.random() * 3) - 1;
+        let yNext;
+        if (xNext === 0) {
+            yNext = Math.random() < 0.5 ? -1 : 1; 
+        } else yNext = 0;
+        this.playTurn(xNext, yNext);
+        if (this.player.gameboard.isShip(xNext, yNext) && !this.player.gameboard.set.has(`(${xNext}, ${yNext})`)) {
+               this.cpuTurn({ xNext, yNext });
+            }
     }
 
     updateBoardSize(newSize) {

@@ -22,6 +22,17 @@ export default function render(gameManager, pOne, pTwo) {
     const startButton = document.querySelector("#start-game");
     const sizeSelect = document.querySelector("#board-size");
 
+    if (!gameManager.gameStarted) {
+        RenderUtils.initDisable(pOneDiv, pTwoDiv);
+        if (gameManager.winner) {
+            gameStatus.textContent = gameManager.winner === "player" 
+                ? "PLAYER wins!!!" 
+                : "CPU wins :(\nBetter luck next time!";
+        } else {
+            gameStatus.textContent = "Waiting for the game to start";
+        }
+    }
+
     function addNewBoardListener(gameManager, pOne, pOneDiv) {
         function handleNewBoard() {
             if (gameManager.gameStarted) {

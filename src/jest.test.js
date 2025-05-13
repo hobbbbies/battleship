@@ -26,6 +26,31 @@ describe("GameManager", () => {
         gameManager = new GameManager(10);
     });
 
+    describe("smartHit", () => {
+      test("cpu should hit consecutive ships", () => {
+                    // Mock Math.random to return values that will give us x=1, y=1
+        const spy = jest.spyOn(global.Math, 'random')
+          .mockReturnValueOnce(0.1)  // For x coordinate
+          .mockReturnValueOnce(0.1); // For y coordinate
+
+        gameManager.player.gameboard.addShipRecursively(1, 1, 2, 0, new Ship(), tempArr);
+        gameManager.player.gameboard.addShipRecursively(1, 1, 2, 0, new Ship(), tempArr);
+
+        gameManager.turn = gameManager.computer;
+        gameManager.cpuTurn();
+        gameManager.turn = gameManager.computer;
+        gameManager.cpuTurn();
+        gameManager.turn = gameManager.computer;
+        gameManager.cpuTurn();
+        gameManager.turn = gameManager.computer;
+        gameManager.cpuTurn();
+        gameManager.turn = gameManager.computer;
+        gameManager.cpuTurn();
+
+        expect(gameManager.playerShips).toBe(0);
+      });
+    });
+
     describe("checkWin", () => {
         test("should have 15 as the ship count", () => {
         gameManager.player.gameboard.init();
@@ -35,6 +60,7 @@ describe("GameManager", () => {
         
         test("should decrease ship count on successful hit", () => {
             gameManager.computer.gameboard.addShipRecursively(1, 1, 2, 0, new Ship(), tempArr);
+            gameManager.player.gameboard.addShipRecursively(5, 5, 1, 0, new Ship(), tempArr);
             gameManager.playTurn(1, 1);
             gameManager.playTurn(3,3);
             gameManager.playTurn(2, 1);
@@ -94,6 +120,22 @@ describe("GameManager", () => {
           expect(markedCells).toBe(1);
 
           jest.spyOn(global.Math, "random").mockRestore(); // restore original
+        });
+
+        test("should hit specific coordinates", () => {
+            // Mock Math.random to return values that will give us x=1, y=1
+            const spy = jest.spyOn(global.Math, 'random')
+                .mockReturnValueOnce(0.1)  // For x coordinate
+                .mockReturnValueOnce(0.1); // For y coordinate
+
+            gameManager.turn = gameManager.computer;
+            gameManager.cpuTurn();
+
+            // Verify the correct cell was hit
+            expect(gameManager.player.gameboard.board[1][1]).toBe('X');
+
+            // Restore original Math.random
+            spy.mockRestore();
         });
     });
 
