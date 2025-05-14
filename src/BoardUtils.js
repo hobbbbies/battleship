@@ -58,4 +58,8 @@ export default class BoardManagement {
     }
     return count;
   }
+
+  static checkMove(x, y, set) {
+    return !set.has(`(${x}, ${y})`) && !this.checkCoordinateBounds(x, y);
+  }
 }

@@ -22,6 +22,10 @@ export default class Gameboard {
     return BoardUtils.getShipCount(this);
   }
 
+  checkMove(x, y, set) {
+    return BoardUtils.checkMove(x, y, set);
+  }
+
   init() {
     
     // Resets all local properties 
@@ -112,7 +116,7 @@ export default class Gameboard {
   }
 
   receiveAttack(x, y) {
-    if (this.set.has(`(${x}, ${y})`) || this.checkCoordinateBounds(x, y))
+    if (!this.checkMove(x, y, this.set))
       return -1;
     this.set.add(`(${x}, ${y})`);
     if (this.isShip(x, y)) {

@@ -1,6 +1,7 @@
 import Ship from "./Ship";
 import Gameboard from "./Gameboard";
 import GameManager from "./GameManager";
+import Cpu from "../src/Cpu";
 
 let tempArr;
 
@@ -25,32 +26,6 @@ describe("GameManager", () => {
     beforeEach(() => {
         gameManager = new GameManager(10);
     });
-
-    describe("smartHit", () => {
-      test("cpu should hit consecutive ships", () => {
-                    // Mock Math.random to return values that will give us x=1, y=1
-        const spy = jest.spyOn(global.Math, 'random')
-          .mockReturnValueOnce(0.1)  // For x coordinate
-          .mockReturnValueOnce(0.1); // For y coordinate
-
-        gameManager.player.gameboard.addShipRecursively(1, 1, 2, 0, new Ship(), tempArr);
-        gameManager.player.gameboard.addShipRecursively(1, 1, 2, 0, new Ship(), tempArr);
-
-        gameManager.turn = gameManager.computer;
-        gameManager.cpu.cpuTurn();
-        gameManager.turn = gameManager.computer;
-        gameManager.cpu.cpuTurn();
-        gameManager.turn = gameManager.computer;
-        gameManager.cpu.cpuTurn();
-        gameManager.turn = gameManager.computer;
-        gameManager.cpu.cpuTurn();
-        gameManager.turn = gameManager.computer;
-        gameManager.cpu.cpuTurn();
-
-        expect(gameManager.playerShips).toBe(0);
-      });
-    });
-
     describe("checkWin", () => {
         test("should have 15 as the ship count", () => {
         gameManager.player.gameboard.init();
@@ -388,4 +363,94 @@ describe("gameboard", () => {
             expect(myBoard.board[5][5]).toBe(null);
         });
     });
+});
+
+describe("Cpu class integration", () => {
+  let manager; 
+  
+  beforeEach(() => {
+    manager = new GameManager(10);
+    manager.player.gameboard.init();
+  });
+
+  test("queueMoves pushes all valid adjacent moves", () => {
+    // Create a real GameManager with a 10x10 board
+    manager.player.gameboard.init(); // Ensure board is initialized
+
+    // Create the Cpu instance
+    const cpu = new Cpu(manager);
+
+    // Push adjacent cells around (5,5)
+    cpu.queueMoves(5, 5);
+
+    // Since (5,5) is central, all four moves should be valid
+    expect(cpu.moveQueue).toHaveLength(4);
+    expect(cpu.moveQueue).toContainEqual({ x: 6, y: 5 });
+    expect(cpu.moveQueue).toContainEqual({ x: 4, y: 5 });
+    expect(cpu.moveQueue).toContainEqual({ x: 5, y: 6 });
+    expect(cpu.moveQueue).toContainEqual({ x: 5, y: 4 });
+  });
+
+  test("queueMoves should not queue moves outside the board", () => {
+    // Create the Cpu instance
+    const cpu = new Cpu(manager);
+
+    // Call queueMoves near the top-left corner at (0,0)
+    cpu.queueMoves(0, 0);
+
+    // Only valid directions from (0,0) are (1,0) and (0,1)
+    expect(cpu.moveQueue).toHaveLength(2);
+    expect(cpu.moveQueue).toContainEqual({ x: 1, y: 0 });
+    expect(cpu.moveQueue).toContainEqual({ x: 0, y: 1 });
+    
+    // None of the negative or out-of-bounds coordinates should be added
+    expect(cpu.moveQueue).not.toContainEqual({ x: -1, y: 0 });
+    expect(cpu.moveQueue).not.toContainEqual({ x: 0, y: -1 });
+  });
+
+  test("once CPU hits the first part of a ship, it queues and hits the next segment", () => {
+    // Place a 2-cell vertical ship at (3,3) and (4,3)
+    manager.player.gameboard.board[3][3] = new Ship(2);
+    manager.player.gameboard.board[4][3] = manager.player.gameboard.board[3][3];
+
+    const cpu = new Cpu(manager);
+    manager.turn = manager.computer;
+
+    // Force CPU to hit the first coordinate
+    cpu.moveQueue.push({ x: 3, y: 3 });
+
+    // CPU hits the first segment
+    cpu.cpuTurn();
+    expect(manager.playerShips).toBe(1);
+
+    // The CPU should now queue adjacent directions from (3,3), including (4,3)
+    expect(cpu.moveQueue).toContainEqual({ x: 4, y: 3 });
+
+    // CPU hits the next segment
+    manager.turn = manager.computer;
+    cpu.cpuTurn();
+    manager.turn = manager.computer;
+    cpu.cpuTurn();
+    manager.turn = manager.computer;
+    cpu.cpuTurn();
+    manager.turn = manager.computer;
+    cpu.cpuTurn();
+
+    expect(manager.playerShips).toBe(0);
+  });
+
+  test("cpuTurn should not queue a move that's already been played", () => {
+    const cpu = new Cpu(manager);
+    manager.turn = manager.computer;
+
+    // Simulate that (3,3) was already attacked
+    // (receiveAttack logs the coordinate in board.set)
+    manager.player.gameboard.receiveAttack(3, 3);
+
+    // Now, when queueMoves is called, (3,3) should be rejected
+    cpu.queueMoves(4, 3);
+
+    // Ensure (3,3) did not get queued again
+    expect(cpu.moveQueue).not.toContainEqual({ x: 3, y: 3 });
+  });
 });
