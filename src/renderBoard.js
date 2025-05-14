@@ -16,7 +16,7 @@ function addCellListener(gameManager, cell) {
     const [x, y] = JSON.parse(cell.dataset.cords);
     console.log(gameManager.turn);
     gameManager.playTurn(x, y);
-    gameManager.cpuTurn();
+    gameManager.cpu.cpuTurn();
     gameManager.render();
   }
 

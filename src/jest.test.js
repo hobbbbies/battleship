@@ -37,15 +37,15 @@ describe("GameManager", () => {
         gameManager.player.gameboard.addShipRecursively(1, 1, 2, 0, new Ship(), tempArr);
 
         gameManager.turn = gameManager.computer;
-        gameManager.cpuTurn();
+        gameManager.cpu.cpuTurn();
         gameManager.turn = gameManager.computer;
-        gameManager.cpuTurn();
+        gameManager.cpu.cpuTurn();
         gameManager.turn = gameManager.computer;
-        gameManager.cpuTurn();
+        gameManager.cpu.cpuTurn();
         gameManager.turn = gameManager.computer;
-        gameManager.cpuTurn();
+        gameManager.cpu.cpuTurn();
         gameManager.turn = gameManager.computer;
-        gameManager.cpuTurn();
+        gameManager.cpu.cpuTurn();
 
         expect(gameManager.playerShips).toBe(0);
       });
@@ -98,7 +98,7 @@ describe("GameManager", () => {
             global.Math = mockMath;
 
             gameManager.turn = gameManager.computer;
-            gameManager.cpuTurn();
+            gameManager.cpu.cpuTurn();
 
             // Verify that multiple attempts were made
             expect(callCount).toBe(6);
@@ -112,7 +112,7 @@ describe("GameManager", () => {
           jest.spyOn(global.Math, "random").mockReturnValue(0.5); // or any fixed value
 
           gameManager.turn = gameManager.computer;
-          gameManager.cpuTurn();
+          gameManager.cpu.cpuTurn();
 
           const markedCells = gameManager.player.gameboard.board
             .flat()
@@ -129,7 +129,7 @@ describe("GameManager", () => {
                 .mockReturnValueOnce(0.1); // For y coordinate
 
             gameManager.turn = gameManager.computer;
-            gameManager.cpuTurn();
+            gameManager.cpu.cpuTurn();
 
             // Verify the correct cell was hit
             expect(gameManager.player.gameboard.board[1][1]).toBe('X');

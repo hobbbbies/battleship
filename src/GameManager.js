@@ -3,12 +3,14 @@ import render from './render';
 import findRandom from './findRandom';
 import RenderUtils from './renderUtils';
 import Gameboard from './Gameboard';
+import Cpu from './Cpu';
 
 export default class GameManager {
     constructor(boardSize) {
         this.boardSize = boardSize;
         this.player = new Player("player", boardSize);
         this.computer = new Player("opponent", boardSize);
+        this.cpu = new Cpu(this);
         this.turn = this.player;
         this.gameStarted = false;
         this.playerShips = 0;
@@ -30,6 +32,7 @@ export default class GameManager {
     }
 
     playTurn(x, y) {
+        this.turn = this.turn === this.player ? this.computer : this.player;
         if(this.turn.gameboard.receiveAttack(x, y) === -1) {
             this.turn = this.turn === this.player ? this.computer : this.player; // Switch turn back
             return -1;
@@ -37,26 +40,14 @@ export default class GameManager {
         this.checkWin();
     }
 
-    cpuTurn(lastHit = {}) {
-        if (this.turn !== this.computer) return;
-        if (Object.keys(lastHit).length > 0) this.smartHit(lastHit.x, lastHit.y);
-        else {
-            const { x, y } = findRandom(this.boardSize);
-            if (this.playTurn(x, y) === -1) this.cpuTurn();
-        }
-    }
-
-    smartHit(x, y) {
-        let xNext = Math.floor(Math.random() * 3) - 1;
-        let yNext;
-        if (xNext === 0) {
-            yNext = Math.random() < 0.5 ? -1 : 1; 
-        } else yNext = 0;
-        this.playTurn(xNext, yNext);
-        if (this.player.gameboard.isShip(xNext, yNext) && !this.player.gameboard.set.has(`(${xNext}, ${yNext})`)) {
-               this.cpuTurn({ xNext, yNext });
-            }
-    }
+    // cpuTurn() {
+    //     if (this.turn !== this.computer) return;
+    //     if (Object.keys(this.cpu.cpuLastHit).length > 0) cpu.smartHit(lastHit.x, lastHit.y);
+    //     else {
+    //         const { x, y } = findRandom(this.boardSize);
+    //         if (this.playTurn(x, y) === -1) this.cpuTurn();
+    //     }
+    // }    
 
     updateBoardSize(newSize) {
         this.player.gameboard = new Gameboard(newSize);
