@@ -13,15 +13,4 @@ export default class RenderUtils {
         RenderUtils.disableBoard(pOneDiv);
         RenderUtils.disableBoard(pTwoDiv);
     }
-
-    static handleSizeChange(e, gameManager, sizeSelector) {
-        if (!gameManager.gameStarted) {
-            const newSize = parseInt(e.target.value);
-            gameManager.updateBoardSize(newSize);
-            gameManager.init();
-        } else {
-            alert("Cannot change board size while game is in progress!");
-            sizeSelector.value = gameManager.boardSize;
-        }
-    }  
 }

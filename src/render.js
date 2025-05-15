@@ -1,6 +1,8 @@
 import renderBoard from "./renderBoard";
 import RenderUtils from "./renderUtils";
 
+const registeredListeners = [];
+
 export default function render(gameManager, pOne, pTwo) {
     const gameStatus = document.querySelector("#status-message");
     const pOneDiv = document.querySelector("#player-board");
@@ -15,11 +17,14 @@ export default function render(gameManager, pOne, pTwo) {
     newBoard.replaceWith(newBoard.cloneNode(true));
     resetBtn.replaceWith(resetBtn.cloneNode(true));
     startBtn.replaceWith(startBtn.cloneNode(true));
+    sizeSelector.replaceWith(sizeSelector.cloneNode(true));
+
     // Re-query elements after replacing
     const newBoardBtn = document.querySelector("#new-board");
     const resetButton = document.querySelector("#reset-game");
     const startButton = document.querySelector("#start-game");
-    // const sizeSelect = document.querySelector("#board-size");
+    const sizeSelect = document.querySelector("#board-size");
+
 
     if (!gameManager.gameStarted) {
         RenderUtils.initDisable(pOneDiv, pTwoDiv);
@@ -67,24 +72,24 @@ export default function render(gameManager, pOne, pTwo) {
         startButton.addEventListener('click', handleGameStart);
     }
 
-    const sizeChangeListener = (e) => {
-        RenderUtils.handleSizeChange(e, gameManager, sizeSelector);
-    };
-
-    function addSizeListener(sizeSelector) {
-        sizeSelector.addEventListener('change', sizeChangeListener);
+    function addSizeListener(gameManager, sizeSelect) {
+      function handleSizeChange(e) {
+        if (!gameManager.gameStarted) {
+          const newSize = parseInt(e.target.value);
+          gameManager.updateBoardSize(newSize);
+          gameManager.init();
+        } else {
+          alert("Cannot change board size while game is in progress!");
+          sizeSelect.value = gameManager.boardSize;
+        }
+      }
+      sizeSelect.addEventListener("change", handleSizeChange);
     }
-
-    function removeSizeListener(gameManager, sizeSelector) {
-        sizeSelector.removeEventListener('change', sizeChangeListener);
-    }
-
-    removeSizeListener(gameManager, sizeSelector);
 
     addNewBoardListener(gameManager, pOne, pOneDiv);
     addResetListener(gameManager, pOne, pTwo, pOneDiv, pTwoDiv, gameStatus);
     addStartListener(gameManager, pOneDiv, pTwoDiv, gameStatus);
-    addSizeListener(gameManager, sizeSelector);
+    addSizeListener(gameManager, sizeSelect);
 
     renderBoard(gameManager, pOne, pOneDiv);
     renderBoard(gameManager, pTwo, pTwoDiv);
