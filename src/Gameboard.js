@@ -10,8 +10,8 @@ export default class Gameboard {
     this.freeSpots = Array.from({ length: size }, () => Array(size).fill(true));
   }
 
-  isShip(x, y) {
-    return BoardUtils.isShip(x, y, this.board);
+  isShip(x, y, board) {
+    return BoardUtils.isShip(x, y, board);
   }
 
   checkCoordinateBounds(x, y) {
@@ -22,8 +22,8 @@ export default class Gameboard {
     return BoardUtils.getShipCount(this);
   }
 
-  checkMove(x, y, set) {
-    return BoardUtils.checkMove(x, y, set);
+  checkMove(x, y, set, size) {
+    return BoardUtils.checkMove(x, y, set, size);
   }
 
   init() {
@@ -82,7 +82,7 @@ export default class Gameboard {
       }
       return 1;
     };
-    if (this.checkCoordinateBounds(x, y) || this.isShip(x, y) || this.freeSpots[y][x] === false) {
+    if (this.checkCoordinateBounds(x, y) || this.isShip(x, y, this.board) || this.freeSpots[y][x] === false) {
       if (orientation === 0) {
         this.deleteShip(x - 1, y, orientation);
       } else {
@@ -104,7 +104,7 @@ export default class Gameboard {
   }
 
   deleteShip(x, y, orientation) {
-    if (this.checkCoordinateBounds(x, y) || !this.isShip(x, y)) return 1;
+    if (this.checkCoordinateBounds(x, y) || !this.isShip(x, y, this.board)) return 1;
 
     this.board[y][x] = null;
     if (orientation === 0) {
@@ -116,10 +116,10 @@ export default class Gameboard {
   }
 
   receiveAttack(x, y) {
-    if (!this.checkMove(x, y, this.set))
+    if (!this.checkMove(x, y, this.set, this.size))
       return -1;
     this.set.add(`(${x}, ${y})`);
-    if (this.isShip(x, y)) {
+    if (this.isShip(x, y, this.board)) {
       this.board[y][x].hit();
       return 1;
     } else {

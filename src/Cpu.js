@@ -10,61 +10,66 @@ export default class Cpu {
       { x: 0, y: -1 },
     ];
     this.moveQueue = [];
-    this.playerSet = gameManager.player.gameboard.set;
+    this.lastMove = {};
   }
 
   cpuTurn() {
         if (this.gameManager.turn !== this.gameManager.computer) return;
         if (this.moveQueue.length) {
-            const { x, y } = this.moveQueue.pop();
-            this.gameManager.playTurn(x, y);
-            if (this.gameManager.player.gameboard.isShip(x, y)) {
-              this.moveQueue = [];
-              this.queueMoves(x, y);
-            }
+            this.smartHit();
         }
         else {
             const { x, y } = findRandom(this.gameManager.boardSize);
             if (this.gameManager.playTurn(x, y) === -1) this.cpuTurn();
-            else if (this.gameManager.player.gameboard.isShip(x, y)) {
+            else if (this.gameManager.player.gameboard.isShip(x, y, this.gameManager.player.gameboard.board)) {
                 this.queueMoves(x, y);
+                this.lastMove.x = x;
+                this.lastMove.y = y;
             }
         }   
     }
 
+    smartHit() {
+        const { x, y } = this.moveQueue.pop();
+        this.gameManager.playTurn(x, y);
+        if (this.gameManager.player.gameboard.isShip(x, y, this.gameManager.player.gameboard.board)) {
+          this.moveQueue = [];
+          const direction = {
+            x: x - this.lastMove.x,
+            y: y - this.lastMove.y,
+          };
+          this.queueDirection(x, y, direction);
+
+          // Pointer to the last hit ship coordiantes 
+          this.lastMove.x = x;
+          this.lastMove.y = y;
+        }
+    }
+
+    // Function that queues next moves once the direction has been discovered
+    // how do we get direction ?  
+    // -Need difference in x y and last move 
+    // -Keep property "last move" that holds only the last move played 
+    queueDirection(x, y, direction) {
+        const set = this.getSet();
+        const newX = x + direction.x;
+        const newY = y + direction.y;
+        if (this.gameManager.player.gameboard.checkMove(newX, newY, set, this.gameManager.boardSize)) {
+            this.moveQueue.push({ x: newX, y : newY });
+        }
+    }
+
     queueMoves(x, y) {
+        const set = this.getSet();
         for (let i in this.directions) {
             const newX = x + this.directions[i].x;
             const newY = y + this.directions[i].y;
-            if (this.gameManager.player.gameboard.checkMove(newX, newY, this.playerSet)) {
+            if (this.gameManager.player.gameboard.checkMove(newX, newY, set, this.gameManager.boardSize)) {
                 this.moveQueue.push({ x: newX, y: newY});
             }
         }
     }
   
-  // Runs when the last cpu hit was a ship. It will try hit all adjascent ships until
-  // it has hit every adjascent cell and has missed all shots.
-  // If one of its adjascent cells is a ship, that becomes the new coordinates that
-  // it will base smartHit off of
-  
-//   smartHit(x, y) {
-//     this.removeInvalidDirecitons(this.directions);
-//     const index = this.randomFromArray(this.directions);
-//     const nextDirection = this.directions[index].pop();
-//     const xNext = nextDirection.x + x;
-//     const yNext = nextDirection.y + y;
-     
-//     this.gameManager.playTurn(xNext, yNext);
-//     if (
-//       this.gameManager.player.gameboard.isShip(xNext, yNext) &&
-//       !this.gameManager.player.gameboard.set.has(`(${xNext}, ${yNext})`)
-//     ) {
-//       this.lastHit = { x: xNext, y: yNext };
-//     } else {
-//       this.lastHit = { x: x, y: y };
-//     }
-//   }
-
   // Filters out illegal directions
   removeInvalidDirecitons() {
     for (let i = 0; i < this.directions.length; i++) {
@@ -78,5 +83,9 @@ export default class Cpu {
   randomFromArray(arr) {
     const idx = Math.floor(Math.random() * arr.length); // random index
     return idx
+  }
+
+  getSet() {
+    return this.gameManager.player.gameboard.set;
   }
 }

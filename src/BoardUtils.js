@@ -6,7 +6,7 @@ export default class BoardManagement {
   }
 
   static isShip(x, y, board) {
-    if (this.checkCoordinateBounds(x, y)) return false;
+    if (this.checkCoordinateBounds(x, y, board.length)) return false;
     return board[y][x] instanceof Ship;
   }
 
@@ -59,7 +59,7 @@ export default class BoardManagement {
     return count;
   }
 
-  static checkMove(x, y, set) {
-    return !set.has(`(${x}, ${y})`) && !this.checkCoordinateBounds(x, y);
+  static checkMove(x, y, set, size) {
+    return !set.has(`(${x}, ${y})`) && !this.checkCoordinateBounds(x, y, size);
   }
 }

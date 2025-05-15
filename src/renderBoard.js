@@ -20,7 +20,7 @@ function addCellListener(gameManager, cell) {
     gameManager.render();
   }
 
-  cell.addEventListener("click", handleCellClick);
+  cell.addEventListener("click", handleCellClick, { once: true });
 }
 
 function createCell(x, y, playerBoard) {
@@ -39,14 +39,14 @@ function updateCellDisplay(cell, playerBoard, x, y) {
 
 function getCellState(playerBoard, x, y) {
   if (playerBoard.gameboard.set.has(`(${x}, ${y})`)) {
-    if (playerBoard.gameboard.isShip(x, y)) {
+    if (playerBoard.gameboard.isShip(x, y, playerBoard.gameboard.board)) {
       return { text: "", className: "hit" };
     } 
     return { text: "X", className: "miss" };
   }
  
-  if (!playerBoard.gameboard.isShip(x, y)) {
-    return { text: '', className: 'empty' };
+  if (!playerBoard.gameboard.isShip(x, y, playerBoard.gameboard.board)) {
+    return { text: "", className: "empty" };
   }
   
   if (playerBoard.gameboard.board[y][x].isSunk()) {

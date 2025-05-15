@@ -373,6 +373,26 @@ describe("Cpu class integration", () => {
     manager.player.gameboard.init();
   });
 
+  describe("queueDirection", () => {
+    test("should queue only the next direction" , () => {
+      manager.cpu.queueDirection(3, 3, { x: 1, y: 0 });
+
+      expect(manager.cpu.moveQueue).toHaveLength(1);
+    });
+  });
+
+  describe("smartHit", () => {
+    test("Should properly label lastMove", () => {
+      manager.cpu.moveQueue.push({ x: 3, y: 3 });
+
+      manager.player.gameboard.board[3][3] = new Ship(2);
+      manager.turn = manager.computer;
+      manager.cpu.cpuTurn();
+      expect(manager.cpu.lastMove).toEqual({ x: 3, y: 3 });
+
+    });
+  });
+
   test("queueMoves pushes all valid adjacent moves", () => {
     // Create a real GameManager with a 10x10 board
     manager.player.gameboard.init(); // Ensure board is initialized
@@ -452,5 +472,32 @@ describe("Cpu class integration", () => {
 
     // Ensure (3,3) did not get queued again
     expect(cpu.moveQueue).not.toContainEqual({ x: 3, y: 3 });
+  });
+
+  test("cpu should get all 4 turns after hitting a ship", () => {
+    manager.player.gameboard.board[3][3] = new Ship(2);
+    manager.player.gameboard.board[4][3] = manager.player.gameboard.board[3][3];
+    manager.player.gameboard.board[5][3] = manager.player.gameboard.board[3][3];
+
+    manager.computer.gameboard.board[3][3] = new Ship(2);
+    manager.computer.gameboard.board[4][3] = manager.computer.gameboard.board[3][3];
+    manager.computer.gameboard.board[5][3] = manager.computer.gameboard.board[3][3];
+    manager.computer.gameboard.board[6][3] = manager.computer.gameboard.board[3][3];
+    manager.computer.gameboard.board[7][3] = manager.computer.gameboard.board[3][3];
+
+
+
+    manager.playTurn(3, 3);
+    
+    cpu.moveQueue.push({ x: 3, y: 3 });
+    manager.cpu.cpuTurn();
+    manager.playTurn(3, 4);
+    manager.cpuTurn();
+    manager.playTurn(3, 5);
+    manager.cpuTurn();
+    manager.playTurn(3, 6);
+    manager.cpuTurn();
+    manager.playTurn(3, 7);
+    manager.cpuTurn();
   });
 });
